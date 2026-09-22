@@ -1,71 +1,83 @@
-# Ex. No: 18C - Dijkstra's Single Source Shortest Path Algorithm
+# Ex. No: 18B - Kruskal's Minimum Spanning Tree (MST) Algorithm
 
 ## AIM:
-To write a Python program for **Dijkstra's single source shortest path algorithm**.
+To write a Python program for **Kruskal's algorithm** to find the Minimum Spanning Tree (MST) of a given connected, undirected, and weighted graph.
 
 ## ALGORITHM:
 
-**Step 1**: Initialize a `distance[]` array with infinity for all vertices except the source, which is set to `0`.  
-Create a `sptSet[]` array (shortest path tree set) to keep track of vertices whose shortest distance from the source is finalized.
+**Step 1**: Sort all the edges of the graph in non-decreasing order of their weights.
 
-**Step 2**: Pick the vertex `u` with the minimum distance value from the set of vertices not yet processed.
+**Step 2**: Initialize the `parent[]` and `rank[]` arrays for each vertex to keep track of the disjoint sets.
 
-**Step 3**: For every adjacent vertex `v` of the picked vertex `u`, if the current distance to `v` is greater than the distance to `u` plus the edge weight `(u, v)`, then update the distance of `v`.
+**Step 3**: Iterate through the sorted edges and pick the smallest edge. Check whether including this edge will form a cycle using the union-find method:
+- If the vertices of the edge belong to different sets, include it in the MST.
+- Perform a union of these two sets.
 
-**Step 4**: Mark the vertex `u` as processed in `sptSet`.
+**Step 4**: Repeat Step 3 until the MST contains exactly `V-1` edges.
 
-**Step 5**: Repeat Steps 2–4 until all vertices are processed.
-
-**Step 6**: Print the shortest distances from the source to all other vertices.
+**Step 5**: Print the edges included in the MST and the total minimum cost.
 
 ## PYTHON PROGRAM
 
 ```python
-import sys
-class Graph():
+from collections import defaultdict
+class Graph:
 	def __init__(self, vertices):
 		self.V = vertices
-		self.graph = [[0 for column in range(vertices)]
-					for row in range(vertices)]
-	def printSolution(self, dist):
-		print("Vertex   Distance from Source")
+		self.graph = []
+	def addEdge(self, u, v, w):
+		self.graph.append([u, v, w])
+	def find(self, parent, i):
+		if parent[i] == i:
+			return i
+		return self.find(parent, parent[i])
+	def union(self, parent, rank, x, y):
+		xroot = self.find(parent, x)
+		yroot = self.find(parent, y)
+		if rank[xroot] < rank[yroot]:
+			parent[xroot] = yroot
+		elif rank[xroot] > rank[yroot]:
+			parent[yroot] = xroot
+		else:
+			parent[yroot] = xroot
+			rank[xroot] += 1
+	def KruskalMST(self):
+		result = []
+		i = 0
+		e = 0
+		self.graph = sorted(self.graph,
+							key=lambda item: item[2])
+		parent = []
+		rank = []
 		for node in range(self.V):
-			print(node, "           ", dist[node])
-	def minDistance(self, dist, sptSet):
-		min = sys.maxsize
-		for u in range(self.V):
-			if dist[u] < min and sptSet[u] == False:
-				min = dist[u]
-				min_index = u
-		return min_index
-	def dijkstra(self, src):
-		dist = [sys.maxsize] * self.V
-		dist[src] = 0
-		sptSet = [False] * self.V
-		for cout in range(self.V):
-			x = self.minDistance(dist, sptSet)
-			sptSet[x] = True
-			for y in range(self.V):
-				if self.graph[x][y] > 0 and sptSet[y]==False and dist[y] > dist[x] + self.graph[x][y]:
-						dist[y] = dist[x] + self.graph[x][y]
-		self.printSolution(dist)
-g = Graph(9)
-g.graph = [
-    [0, 4, 0, 0, 0, 0, 0, 8, 0],
-    [4, 0, 8, 0, 0, 0, 0, 11, 0],
-    [0, 8, 0, 7, 0, 4, 0, 0, 2],
-    [0, 0, 7, 0, 6, 14, 0, 0, 0],
-    [0, 0, 0, 6, 0, 5, 0, 0, 0],
-    [0, 0, 4, 14, 5, 0, 2, 0, 0],
-    [0, 0, 0, 0, 0, 2, 0, 1, 6],
-    [8, 11, 0, 0, 0, 0, 1, 0, 7],
-    [0, 0, 2, 0, 0, 0, 6, 7, 0]
-]
-g.dijkstra(0);
+		    parent.append(node)
+		    rank.append(0)
+		while e<self.V-1:
+			u,v,w=self.graph[i]
+			i=i+1
+			x=self.find(parent,u)
+			y=self.find(parent,v)
+			if x!=y:
+			    e=e+1
+			    result.append([u,v,w])
+			    self.union(parent,rank,x,y)
+		minimumCost=0
+		print("Edges in the constructed MST")
+		for u,v,weight in result:
+		    minimumCost+=weight
+		    print("%d -- %d == %d" % (u,v,weight))
+		print("Minimum Spanning Tree",minimumCost)
+g = Graph(4)
+g.addEdge(0, 1, 10)
+g.addEdge(0, 2, 6)
+g.addEdge(0, 3, 5)
+g.addEdge(1, 3, 15)
+g.addEdge(2, 3, 4)
+g.KruskalMST()
 ```
 
 ## OUTPUT
-<img width="1184" height="407" alt="image" src="https://github.com/user-attachments/assets/dbd5af1b-4436-4adc-8149-52224874465c" />
+<img width="1185" height="285" alt="image" src="https://github.com/user-attachments/assets/06a79868-f168-4a30-bcef-cffdf6bc1d7a" />
 
 ## RESULT
-Therefore, the output is the example to write a Python program for **Dijkstra's single source shortest path algorithm**.
+Therefore, the output is the example to write a Python program for **Kruskal's algorithm** to find the Minimum Spanning Tree (MST) of a given connected, undirected, and weighted graph.
